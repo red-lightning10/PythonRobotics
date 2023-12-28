@@ -7,6 +7,7 @@ author Atsushi Sakai(@Atsushi_twi)
 """
 import sys
 import pathlib
+import math
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 from math import sin, cos, atan2, sqrt, acos, pi, hypot
@@ -285,29 +286,43 @@ def main():
     import matplotlib.pyplot as plt
     from utils.plot import plot_arrow
 
-    start_x = 1.0  # [m]
-    start_y = 1.0  # [m]
-    start_yaw = np.deg2rad(45.0)  # [rad]
 
-    end_x = -3.0  # [m]
-    end_y = -3.0  # [m]
-    end_yaw = np.deg2rad(-45.0)  # [rad]
+    #input the output - row_cols, rotations - from tools->main.py to here in proper format
+    start_x = [0.0, 1.0, 2.0, 3.0, 4.0, 4.0, 4.0, 5.0, 6.0]  # [m]
+    start_y = [1.0, 2.0, 3.0, 3.0, 4.0, 5.0, 6.0, 7.0, 7.0]  # [m]
+    print(np.array(10))
+    start_yaw = [np.deg2rad(0.0), np.deg2rad(45.0), np.deg2rad(45.0), np.deg2rad(0.0), np.deg2rad(45.0), np.deg2rad(90.0), np.deg2rad(90.0), np.deg2rad(45.0), np.deg2rad(0.0), np.deg2rad(0.0)]  # [rad]
 
-    curvature = 1.0
+    end_x = [1.0, 2.0, 3.0, 4.0, 4.0, 4.0, 5.0, 6.0, 7.0]  # [m]
+    end_y = [2.0, 3.0, 3.0, 4.0, 5.0, 6.0, 7.0, 7.0, 8.0]  # [m]
+    end_yaw = [np.deg2rad(45.0), np.deg2rad(45.0), np.deg2rad(0.0), np.deg2rad(45.0), np.deg2rad(90.0), np.deg2rad(90.0), np.deg2rad(45.0), np.deg2rad(0.0), np.deg2rad(0.0), np.deg2rad(45.0)]  # [rad]
 
-    path_x, path_y, path_yaw, mode, lengths = plan_dubins_path(start_x,
-                                                               start_y,
-                                                               start_yaw,
-                                                               end_x,
-                                                               end_y,
-                                                               end_yaw,
-                                                               curvature)
+    #change these values if loops are generated (increment the values in that case)
+    curvature = [1.75, 1.75, 1.75, 1.75, 1.75, 1.75, 2, 2, 2]
+    px = []
+    py = []
+    paths_x = []
+    paths_y = []
+    for i in range(len(start_x)):
+        path_x, path_y, path_yaw, mode, lengths = plan_dubins_path(start_x[i],
+                                                               start_y[i],
+                                                               start_yaw[i],
+                                                               end_x[i],
+                                                               end_y[i],
+                                                               end_yaw[i],
+                                                               curvature[i])
+        print(len(path_x))
+        paths_x = np.append(paths_x, path_x)
+        paths_y = np.append(paths_y, path_y)
+    px = np.array2string(paths_x, separator= ',')
+    py = np.array2string(paths_y, separator = ',')
+    inc = math.pi/4
 
     if show_animation:
-        plt.plot(path_x, path_y, label="".join(mode))
+        plt.plot(paths_x, paths_y, label="".join(mode))
         plot_arrow(start_x, start_y, start_yaw)
         plot_arrow(end_x, end_y, end_yaw)
-        plt.legend()
+        # plt.legend()
         plt.grid(True)
         plt.axis("equal")
         plt.show()
